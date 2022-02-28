@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "482046756448",
+    "project_id": "sport-97dd1",
+    "storage_bucket": "sport-97dd1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:482046756448:android:85947793d615435aa3e505",
+        "android_client_info": {
+          "package_name": "com.example.sport_shopping_online"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "482046756448-ft1s65d3p5f6kbhr8okh5fs6f84kjqie.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDjMwXU7aY2E_08CPKFlPmWrEVjh_H-OGY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "482046756448-ft1s65d3p5f6kbhr8okh5fs6f84kjqie.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
