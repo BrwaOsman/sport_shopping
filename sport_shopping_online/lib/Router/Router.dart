@@ -11,6 +11,7 @@ import 'package:sport_shopping_online/page/DitalePage.dart';
 import 'package:sport_shopping_online/page/Home.dart';
 import 'package:sport_shopping_online/page/myAccount.dart';
 
+import '../page/About.dart';
 import '../page/category.dart';
 
 class Router_all extends StatefulWidget {
@@ -38,6 +39,7 @@ class _RouterState extends State<Router_all> {
       '/register_user':(context)=>Register(),
       '/login':(context)=>Login_system(),
       '/orders':(context)=>Card_show(),
+      '/about': (context) => About(),
       '/category':(context)=>Category_show(),
       '/edit':(context)=>AddProdect(),
       '/detail':(context)=>DitalePage(),

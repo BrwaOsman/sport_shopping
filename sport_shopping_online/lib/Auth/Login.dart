@@ -3,6 +3,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:lottie/lottie.dart';
 import 'package:sport_shopping_online/page/Home.dart';
 
@@ -27,6 +28,7 @@ class _Login_systemState extends State<Login_system>
     _tabController = TabController(vsync: this, length: 2);
   }
 
+  User? theUser = FirebaseAuth.instance.currentUser;
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
   Widget build(BuildContext context) {
     return Scaffold(
@@ -171,9 +173,16 @@ class _Login_systemState extends State<Login_system>
         .collection('users')
         .doc(_auth.currentUser!.uid)
         .get()
-        .then((value) {
+        .then((value) async{
       if (!value.exists) {
         print('user not found');
+          AlertDialog alertDialog = AlertDialog(
+        title: Text('Error'),
+        content: Text('user not found *',style: TextStyle(fontSize: 20,color:Colors.red ),),
+      );
+      showDialog(context: context, builder: (_) => alertDialog);
+            await FirebaseAuth.instance.signOut();
+          setTheUser(null);
       } else {
         print('user found');
         Navigator.push(
@@ -186,9 +195,42 @@ class _Login_systemState extends State<Login_system>
     });
   }
 
+  void setTheUser(User? user) {
+    theUser = user;
+  }
+
   Future send_login_admin() async {
-    UserCredential login = await _auth.signInWithEmailAndPassword(
-        email: _emailController.text, password: _passwordController.text);
-    return Navigator.pushNamed(context, '/category');
+    // login_admin
+    try {
+      UserCredential login = await _auth.signInWithEmailAndPassword(
+          email: _emailController.text, password: _passwordController.text);
+
+      await _firestore
+          .collection('admin')
+          .doc(login.user!.uid)
+          .get()
+          .then((value) async {
+        if (!value.exists)  {
+          print('admin not found');
+           AlertDialog alertDialog = AlertDialog(
+        title: Text('Error'),
+        content: Text('Admin not found *',style: TextStyle(fontSize: 20,color:Colors.red ),),
+      );
+      showDialog(context: context, builder: (_) => alertDialog);
+            await FirebaseAuth.instance.signOut();
+          setTheUser(null);
+        } else {
+          print('admin found');
+          return Navigator.pushNamed(context, '/category');
+        }
+      });
+    } on PlatformException catch (e) {
+      print(e);
+      AlertDialog alertDialog = AlertDialog(
+        title: Text('Error'),
+        content: Text(e.message!),
+      );
+      showDialog(context: context, builder: (_) => alertDialog);
+    }
   }
 }

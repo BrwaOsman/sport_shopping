@@ -26,9 +26,6 @@ class CardModel {
       this.size,
       this.color,
       this.quantity,
-    
-      
-
       });
 
   factory CardModel.fromMap(map) {
@@ -40,21 +37,17 @@ class CardModel {
       quantity: map['quantity'],
       size: map['size'],
       color: map['color'],
-     
-
     );
   }
   Map<String, dynamic> toMap() {
     return {
-  
       'name': name,
       'image': image,
       'category': category,
       'price': price,
-        'size': size,
-        'color': color,
+      'size': size,
+      'color': color,
       'quantity': quantity,
-    
     };
   }
 }

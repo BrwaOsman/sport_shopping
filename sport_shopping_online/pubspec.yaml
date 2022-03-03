@@ -46,6 +46,9 @@ dependencies:
   flutter_svg: ^1.0.3
   flutter_material_color_picker: ^1.1.0+2
   flutter_vector_icons: ^1.0.0
+  custom_radio: ^0.1.2
+
+
 
 dev_dependencies:
   flutter_test:
@@ -73,6 +76,7 @@ flutter:
   assets:
     - assets/Lottie/
     - assets/img/profile.png
+    - assets/icon/
   
 
   # An image asset can refer to one or more resolution-specific "variants", see
@@ -109,5 +113,9 @@ flutter:
     - family: Nunito
       fonts:
         - asset: assets/fonts/NunitoBold.ttf
+
+    - family: About
+      fonts:
+        - asset: assets/fonts/About.ttf
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages

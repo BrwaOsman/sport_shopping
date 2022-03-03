@@ -1,19 +1,20 @@
-// ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors, camel_case_types, prefer_final_fields
+// ignore_for_file: prefer_const_constructors
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:sport_shopping_online/model/Crad_model.dart';
 
-class Card_show extends StatefulWidget {
-  const Card_show({Key? key}) : super(key: key);
+import '../model/Crad_model.dart';
+
+class MyFavotite extends StatefulWidget {
+  const MyFavotite({ Key? key }) : super(key: key);
 
   @override
-  _Card_showState createState() => _Card_showState();
+  State<MyFavotite> createState() => _MyFavotiteState();
 }
 
-class _Card_showState extends State<Card_show> {
-  FirebaseFirestore _firestore = FirebaseFirestore.instance;
+class _MyFavotiteState extends State<MyFavotite> {
+   FirebaseFirestore _firestore = FirebaseFirestore.instance;
   ScrollController _scrollController = new ScrollController();
 
   Color? otherColor;
@@ -192,14 +193,4 @@ class _Card_showState extends State<Card_show> {
                 );
   }
 
-  ///await firestore
-  // .collection('users')
-  // .doc(FirebaseAuth.instance.currentUser!.uid)
-  // .collection('card')
-  // .add(cardModel.toMap());
-
-  // Widget show_card(User? user) {
-  //   );
-  
-  // }
 }

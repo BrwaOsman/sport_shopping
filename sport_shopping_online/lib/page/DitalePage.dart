@@ -43,6 +43,7 @@ class _DitalePageState extends State<DitalePage> {
   String? otherColorString;
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   // FirebaseAuth _auth = ;
+  bool isFavorite = false;
   @override
   void initState() {
     // TODO: implement initState
@@ -96,7 +97,7 @@ class _DitalePageState extends State<DitalePage> {
         centerTitle: false,
         elevation: 0,
       ),
-      backgroundColor: otherColor,
+      backgroundColor: Colors.grey[500],
 
       body: SafeArea(
         child: Stack(
@@ -168,7 +169,6 @@ class _DitalePageState extends State<DitalePage> {
                                           !isSelectedList[index];
                                     });
                                     if (isSelectedList[index] == true) {
-                                      otherColor = otherColor2;
                                       otherColorString = widget.color![index];
                                     }
                                   }, index),
@@ -218,13 +218,21 @@ class _DitalePageState extends State<DitalePage> {
                         width: 50,
                         height: 50,
                         decoration: BoxDecoration(
-                          color: Color(0xFFC02411),
+                          color:isFavorite? Colors.white:Colors.red,
                           shape: BoxShape.circle,
                         ),
-                        child: Icon(
-                          Icons.favorite_sharp,
-                          color: Color(0xFFF8F0F0),
+                        child: IconButton(
+                          onPressed: () {
+                          setState(() {
+                            isFavorite = !isFavorite;
+                          });
+                           
+                          },
+                         icon: Icon(
+                            Icons.favorite_sharp,
+                          color: isFavorite == false?Colors.white : Colors.red,
                           size: 30,
+                          ),
                         ),
                       ),
                     ),
@@ -239,10 +247,9 @@ class _DitalePageState extends State<DitalePage> {
                                   borderRadius: BorderRadius.circular(13)),
                               onPressed: () async {
                                 print('clicked');
-                               await add_card().then((value){
-
-                                Navigator.pushNamed(context, '/orders');
-                               });
+                                await add_card().then((value) {
+                                  Navigator.pushNamed(context, '/orders');
+                                });
                               },
                               child: Icon(Icons.shopping_cart_outlined),
                             ))),
@@ -259,7 +266,7 @@ class _DitalePageState extends State<DitalePage> {
                                 color: Color(0xFFF8F0F0),
                               ),
                             ),
-                            color: otherColor,
+                            color: Colors.green,
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(15)),
                             onPressed: () {/** */},
@@ -272,7 +279,7 @@ class _DitalePageState extends State<DitalePage> {
             Align(
               alignment: Alignment(-0.89, -0.95),
               child: Text(
-                'Aristocratic Hand Bag',
+                'Aristocratic ${widget.category}',
                 style: TextStyle(
                   fontFamily: 'Poppins',
                   color: Color(0xFFF8F0F0),
@@ -304,7 +311,7 @@ class _DitalePageState extends State<DitalePage> {
             Align(
               alignment: Alignment(-0.64, -0.49),
               child: Text(
-                '\$${widget.number}',
+                '\$${widget.number}, 000',
                 style: TextStyle(
                   fontFamily: 'Poppins',
                   color: Color(0xFFF8F0F0),
@@ -405,14 +412,17 @@ class _DitalePageState extends State<DitalePage> {
       image: widget.image1,
       quantity: amountState.number,
       category: widget.category,
-      color: otherColorString,
+      color: otherColorString == null ? 'black' : otherColorString,
       size: 'M',
+    
     );
     await firestore
         .collection('users')
         .doc(FirebaseAuth.instance.currentUser!.uid)
         .collection('card')
-        .add(cardModel.toMap());
+        .doc()
+        .set(cardModel.toMap());
+    // .add(cardModel.toMap());
   }
 }
 

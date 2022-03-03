@@ -271,7 +271,7 @@ class _AddProdectState extends State<AddProdect> {
                   if (_formKey.currentState!.validate()) {
                     _formKey.currentState!.save();
                     AddProdect();
-                    Navigator.pushNamed(context, '/');
+                    Navigator.pushNamed(context, '/category');
                   }
                 },
                 child: Text('Add Product'),
