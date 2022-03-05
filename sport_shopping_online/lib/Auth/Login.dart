@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, camel_case_types, prefer_final_fields, non_constant_identifier_names, avoid_unnecessary_containers, avoid_print
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -30,13 +30,21 @@ class _Login_systemState extends State<Login_system>
 
   User? theUser = FirebaseAuth.instance.currentUser;
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[400],
       appBar: AppBar(
-        title: Text('Login'),
+        backgroundColor: Colors.grey[400],
+        title: Text('Login system', style: TextStyle(color: Colors.black, fontSize: 20,fontFamily: 'Nisebuschgardens'),),
         centerTitle: true,
+        elevation: 0,
+         automaticallyImplyLeading: false,
         bottom: TabBar(
           controller: _tabController,
+          indicatorColor: Colors.black,
+          labelColor: Colors.black ,
+          unselectedLabelColor: Colors.grey,
           tabs: [
             Tab(text: 'Login_Admin'),
             Tab(text: 'Login_User'),
@@ -62,7 +70,7 @@ class _Login_systemState extends State<Login_system>
             Center(
               child: Text(
                 'Login_Admin',
-                style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white, fontFamily: 'AquinoDemo'),
               ),
             ),
             Center(
@@ -71,12 +79,16 @@ class _Login_systemState extends State<Login_system>
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextField(
+           
                 controller: _emailController,
                 decoration: InputDecoration(
+                  fillColor: Colors.white, filled: true,
+                  label: Text('Email') ,
                   hintText: 'Enter your email',
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(20),
                   ),
+
                 ),
               ),
             ),
@@ -85,15 +97,24 @@ class _Login_systemState extends State<Login_system>
               child: TextField(
                 controller: _passwordController,
                 decoration: InputDecoration(
+                    fillColor: Colors.white, filled: true,
+                  label: Text('Password') ,
                   hintText: 'Enter your password',
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(20),
                   ),
                 ),
+                obscureText: true,
               ),
             ),
             ElevatedButton(
-              child: Text('Login'),
+              style:ElevatedButton.styleFrom(
+                primary: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: Text('Login',style: TextStyle(color: Colors.black,fontSize: 24,fontFamily: 'Nisebuschgardens'),),
               onPressed: () {
                 send_login_admin();
               },
@@ -113,7 +134,7 @@ class _Login_systemState extends State<Login_system>
             Center(
               child: Text(
                 'Login_User',
-                style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white, fontFamily: 'AquinoDemo'),
               ),
             ),
             Center(
@@ -124,9 +145,11 @@ class _Login_systemState extends State<Login_system>
               child: TextField(
                 controller: _userEmailController,
                 decoration: InputDecoration(
+                    fillColor: Colors.white, filled: true,
+                  label: Text('Email') ,
                   hintText: 'Enter your email',
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(20),
                   ),
                 ),
               ),
@@ -136,27 +159,47 @@ class _Login_systemState extends State<Login_system>
               child: TextField(
                 controller: _userPasswordController,
                 decoration: InputDecoration(
+                    fillColor: Colors.white, filled: true,
+                  label: Text('Password') ,
                   hintText: 'Enter your password',
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(20),
                   ),
                 ),
+                obscureText: true,
               ),
             ),
             ElevatedButton(
-              child: Text('Login'),
+                   style:ElevatedButton.styleFrom(
+                primary: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
+              child: Text('Login',  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold,color: Colors.black,fontFamily: 'Nisebuschgardens'),),
               onPressed: () {
                 send_login_user();
               },
             ),
-            TextButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, '/register_user');
-                },
-                child: Text(
-                  'Add new user',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                )),
+            Container(
+              height: 180,
+              alignment: Alignment.bottomCenter,
+              child: TextButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/register_user');
+                  },
+           
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Don't have account?",
+                        style: TextStyle(fontSize: 15,color: Colors.white),
+                      ),
+                      Text(" Create Account",style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold,color: Colors.black),),
+                    ],
+                  )),
+            ),
           ],
         ),
       ),

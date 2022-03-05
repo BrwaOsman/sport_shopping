@@ -1,14 +1,41 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 
-class MyAccount extends StatelessWidget {
+import '../model/Crad_model.dart';
+
+class MyAccount extends StatefulWidget {
+  const MyAccount({ Key? key }) : super(key: key);
+
+  @override
+  State<MyAccount> createState() => _MyAccountState();
+}
+
+class _MyAccountState extends State<MyAccount> {
   FirebaseAuth _auth = FirebaseAuth.instance;
+  FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  String ? GetUserName;
+  int numberOfCards = 0;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    var getdata =  _firestore.collection('users').doc(FirebaseAuth.instance.currentUser!.uid).get();
+    getdata.then((value) {
+      setState(() {
+        GetUserName = value.data()!['user_name'];
+      });
+    
+    });
+    // print(getdata);
+  
+  }
   @override
   Widget build(BuildContext context) {
-    User? user = _auth.currentUser;
+      // User? user = _auth.currentUser;
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     return Stack(
@@ -87,7 +114,7 @@ class MyAccount extends StatelessWidget {
                                       height: 80,
                                     ),
                                     Text(
-                                      '${user?.email}',
+                                      '${GetUserName}',
                                       style: TextStyle(
                                         color: Color.fromRGBO(39, 105, 171, 1),
                                         fontFamily: 'Nunito',
@@ -112,7 +139,7 @@ class MyAccount extends StatelessWidget {
                                               ),
                                             ),
                                             Text(
-                                              '10',
+                                              '$numberOfCards',
                                               style: TextStyle(
                                                 color: Color.fromRGBO(
                                                     39, 105, 171, 1),
@@ -134,7 +161,7 @@ class MyAccount extends StatelessWidget {
                               top: 110,
                               right: 20,
                               child: IconButton(onPressed:() {
-                                
+                                Navigator.pushNamed(context, '/edit_profile');
                               },  icon: Icon(
                                 AntDesign.edit,
                                 color: Colors.grey[700],
@@ -191,23 +218,66 @@ class MyAccount extends StatelessWidget {
                           SizedBox(
                             height: 10,
                           ),
-                          Container(
-                            height: height * 0.15,
-                            decoration: BoxDecoration(
-                              color: Colors.grey,
-                              borderRadius: BorderRadius.circular(30),
-                            ),
+                          StreamBuilder<QuerySnapshot>(
+                              stream: _firestore
+                                  .collection('users')
+                                  .doc(FirebaseAuth.instance.currentUser!.uid)
+                                  .collection('card').snapshots(),
+                               
+                            builder: (context, snapshot) {
+                              if (snapshot.data != null) {
+                               var _theDocs =  snapshot.data!.docs.map((e) => CardModel.fromMap(e.data())).toList();
+                             
+                                 numberOfCards = _theDocs.length;
+                             
+                                return Expanded(child: ListView.builder(
+                                  
+                                  itemBuilder: (context, index) {
+                                  return Card(
+                                    elevation: 0,
+                                    child: ListTile(
+                                      leading: Image.network(_theDocs[index].image!),
+                                      title: Text(
+                                        '${_theDocs[index].name}',
+                                        style: TextStyle(
+                                          color: Colors.grey[700],
+                                          fontFamily: 'Nunito',
+                                          fontSize: 20,
+                                        ),
+                                      ),
+                                      subtitle: Text(
+                                        '${_theDocs[index].price} \$',
+                                        style: TextStyle(
+                                          color: Colors.grey[700],
+                                          fontFamily: 'Nunito',
+                                          fontSize: 20,
+                                        ),
+                                      ),
+                                      trailing: Text(
+                                        '${_theDocs[index].quantity}',
+                                        style: TextStyle(
+                                          color: Colors.grey[700],
+                                          fontFamily: 'Nunito',
+                                          fontSize: 20,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },itemCount: _theDocs.length,),);
+                              }
+                              return show_order(height);
+                            }
                           ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Container(
-                            height: height * 0.15,
-                            decoration: BoxDecoration(
-                              color: Colors.grey,
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                          ),
+                          // SizedBox(
+                          //   height: 10,
+                          // ),
+                          // Container(
+                          //   height: height * 0.15,
+                          //   decoration: BoxDecoration(
+                          //     color: Colors.grey,
+                          //     borderRadius: BorderRadius.circular(30),
+                          //   ),
+                          // ),
                         ],
                       ),
                     ),
@@ -219,5 +289,15 @@ class MyAccount extends StatelessWidget {
         )
       ],
     );
+  }
+
+  Container show_order(double height) {
+    return Container(
+                              height: height * 0.15,
+                              decoration: BoxDecoration(
+                                color: Colors.red,
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                            );
   }
 }

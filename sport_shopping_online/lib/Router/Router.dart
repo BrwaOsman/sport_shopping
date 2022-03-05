@@ -10,8 +10,10 @@ import 'package:sport_shopping_online/page/Card_show.dart';
 import 'package:sport_shopping_online/page/DitalePage.dart';
 import 'package:sport_shopping_online/page/Home.dart';
 import 'package:sport_shopping_online/page/myAccount.dart';
+import 'package:sport_shopping_online/page/myFavorite.dart';
 
 import '../page/About.dart';
+import '../page/Edit_profile.dart';
 import '../page/category.dart';
 
 class Router_all extends StatefulWidget {
@@ -42,7 +44,10 @@ class _RouterState extends State<Router_all> {
       '/about': (context) => About(),
       '/category':(context)=>Category_show(),
       '/edit':(context)=>AddProdect(),
+      '/favorite':(context)=>MyFavotite(),
       '/detail':(context)=>DitalePage(),
+      '/edit_profile': (context) => EditProfile(),
+
     }
       
     );

@@ -26,16 +26,16 @@ class _AboutState extends State<About> {
       body: Column(
         children: [
           Container(
-            width:250,
-            height: 250,
+            width:200,
+            height: 200,
             alignment: Alignment.center,
             margin: EdgeInsets.all(20),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
               // color: Colors.white,
               image: DecorationImage(
-                image: NetworkImage('https://scontent.fisu6-2.fna.fbcdn.net/v/t39.30808-6/272182849_674226850277844_651025304481246735_n.jpg?_nc_cat=107&ccb=1-5&_nc_sid=09cbfe&_nc_eui2=AeGWz6mm0t-EHofUIW4m8f-utEL4o8szlIS0QvijyzOUhFxdiN4PtDaeaQ3ZaktwkZLXB2M2KNzepwtCXYuX52vI&_nc_ohc=VsAK9_SSBP4AX-DwPCN&tn=vatK3agCGqXVTIy1&_nc_ht=scontent.fisu6-2.fna&oh=00_AT89C7rBJDVM_e92EfBRRJBupOLqKr61cIpGiPpD5B9xzQ&oe=62226AB5'),
-                fit: BoxFit.cover,
+                image: AssetImage('assets/img/about.jpg'),
+                // fit: BoxFit.cover,
               ),
             ),
             // child: Image.network('',

@@ -8,15 +8,15 @@ import 'package:uuid/uuid.dart';
 class FireStor {
   FirebaseFirestore _fireStore = FirebaseFirestore.instance;
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> getDataUser(String? name) {
+  Stream<QuerySnapshot<Map<String, dynamic>>> getDataUser(String? name,String category_test) {
     if (name != null) {
       return _fireStore
-          .collection("product")
+          .collection("products").where('category', isEqualTo: category_test)
           .where('name', isEqualTo: name)
           // .where('barcode', isEqualTo: barcode)
           .snapshots();
     } else {
-      return _fireStore.collection("product").snapshots();
+      return _fireStore.collection("products").where('category', isEqualTo: category_test).snapshots();
     }
   }
 

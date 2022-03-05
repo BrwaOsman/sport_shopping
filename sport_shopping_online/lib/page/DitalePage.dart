@@ -1,5 +1,5 @@
 // import 'dart:html';
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, deprecated_member_use
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, deprecated_member_use, avoid_print, sized_box_for_whitespace, non_constant_identifier_names, unused_local_variable, unnecessary_string_interpolations, prefer_if_null_operators
 
 import 'dart:ui';
 
@@ -9,7 +9,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:sport_shopping_online/model/Crad_model.dart';
+import 'package:sport_shopping_online/model/favorite_model.dart';
 import 'package:sport_shopping_online/page/Card_show.dart';
+import 'package:sport_shopping_online/server/show_order.dart';
+
 // import 'package:google_fonts/google_fonts.dart';
 
 class DitalePage extends StatefulWidget {
@@ -17,12 +20,15 @@ class DitalePage extends StatefulWidget {
   final String? title;
   final int? number;
   final List? color;
-  final String? primary;
+  final String? id_product;
   final List? size;
   final String? description;
   final String? category;
+  final int? id;
+
   const DitalePage(
       {Key? key,
+      this.id_product,
       this.image1,
       this.title,
       this.number,
@@ -30,7 +36,7 @@ class DitalePage extends StatefulWidget {
       this.size,
       this.description,
       this.category,
-      this.primary})
+      this.id,})
       : super(key: key);
 
   @override
@@ -41,30 +47,75 @@ class _DitalePageState extends State<DitalePage> {
   Color? otherColor;
   Color? otherColor2;
   String? otherColorString;
+  String? otherSizeString;
   FirebaseFirestore firestore = FirebaseFirestore.instance;
-  // FirebaseAuth _auth = ;
-  bool isFavorite = false;
+  FirebaseAuth _auth = FirebaseAuth.instance;
+
+  int number_of_item = 0;
+  List<bool> isSelectedList = [false, false, false, false, false];
+  List<bool> isSelectedList_size = [false, false, false, false, false];
+  bool favorite = false;
+  show_Order order = show_Order();
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-
-    String typeColors = widget.primary!;
-    String valueString =
-        typeColors.split('(0x')[1].split(')')[0]; // kind of hacky..
-    int value = int.parse(valueString, radix: 16);
-    otherColor = new Color(value);
-    print(widget.color);
-    setState(() {});
+    get_data();
   }
 
-  List<bool> isSelectedList = [false, false, false, false, false];
+  // update favorite product
+  Future get_data() async {
+    var Docreference = firestore
+        .collection("users")
+        .doc(_auth.currentUser!.uid)
+        .collection("favorite")
+        .doc(widget.id_product);
+    await Docreference.get().then((value) {
+      if (value.exists) {
+        setState(() {
+          favorite = true;
+        });
+      } else {
+        setState(() {
+          favorite = false;
+        });
+      }
+    });
+
+    
+  }
+
+  // add favorite product
+  Future addFavorite(bool isfavorit) async {
+    FavoriteModel favoriteModel = FavoriteModel(
+      category: widget.category,
+      name: widget.title,
+      color: widget.color,
+      image: widget.image1,
+      price: widget.number,
+      size: widget.size,
+    );
+    var Docreference = firestore
+        .collection("users")
+        .doc(_auth.currentUser!.uid)
+        .collection("favorite")
+        .doc(widget.id_product);
+
+    if (isfavorit) {
+      return await Docreference.set(favoriteModel.toMap());
+    } else {
+      return await Docreference.delete();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       // key: scaffoldKey,
-
+// floatingActionButton: FloatingActionButton(
+//   onPressed: () {
+//      order.Show_number_Item(number_of_item);
+//    }) ,
       appBar: AppBar(
         title: Text(
           'DitalePage',
@@ -80,19 +131,43 @@ class _DitalePageState extends State<DitalePage> {
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
-          Padding(
-            padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
-            child: IconButton(
-              onPressed: () {
-                print('clicked');
-              },
-              icon: Icon(
-                Icons.shopping_cart_outlined,
-                color: Color(0xFF817B7B),
-                size: 35,
+          Stack(
+            children: [
+              IconButton(
+                onPressed: () {
+                  print('clicked');
+                  Navigator.pushNamed(context, '/orders');
+                },
+                icon: Icon(
+                  Icons.shopping_cart_outlined,
+                  color: Color(0xFF817B7B),
+                  size: 35,
+                ),
               ),
-            ),
-          )
+              Positioned(
+                left: -7,
+                top: 15,
+                child: Container(
+                  height: 20,
+                  width: 30,
+                  //   decoration: BoxDecoration(
+                  //       color: Colors.green,
+                  //       shape: BoxShape.circle,
+                  //       border: Border.all(color: Colors.white, width: 3)),
+                  child: Center(
+                    child: Text(
+                      '$number_of_item',
+                      style: TextStyle(
+                          color: Colors.red,
+                          // fontFamily: 'AquinoDemo',
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              )
+            ],
+          ),
         ],
         centerTitle: false,
         elevation: 0,
@@ -156,11 +231,12 @@ class _DitalePageState extends State<DitalePage> {
                                   .split('(0x')[1]
                                   .split(')')[0]; // kind of hacky..
                               int value = int.parse(valueString, radix: 16);
-                              otherColor2 = new Color(value);
+                              otherColor2 = Color(value);
                               print(otherColor2);
                               return Align(
                                 alignment: Alignment(-0.50, -0.43),
                                 child: Container(
+                                  margin: EdgeInsets.all(5),
                                   width: 20,
                                   height: 20,
                                   child: Colors_show(otherColor2!, () {
@@ -170,6 +246,14 @@ class _DitalePageState extends State<DitalePage> {
                                     });
                                     if (isSelectedList[index] == true) {
                                       otherColorString = widget.color![index];
+                                      isSelectedList = [
+                                        false,
+                                        false,
+                                        false,
+                                        false,
+                                        false
+                                      ];
+                                      isSelectedList[index] = true;
                                     }
                                   }, index),
                                 ),
@@ -182,22 +266,53 @@ class _DitalePageState extends State<DitalePage> {
                     // ),
                     // Align(
                     Align(
-                        alignment: Alignment(0.43, -0.56),
-                        child: RichText(
-                          text: TextSpan(
-                              style: TextStyle(color: Colors.black),
-                              children: [
-                                TextSpan(
-                                  text: 'Size\n',
-                                  style: TextStyle(
-                                    fontFamily: 'Poppins',
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                TextSpan(text: '12 cm'),
-                              ]),
-                        )),
+                      alignment: Alignment(0.4, -0.65),
+                      child: Text('Size',
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold,
+                          )),
+                    ),
+                    Container(
+                      height: 150,
+                      width: double.infinity,
+                      margin: EdgeInsets.fromLTRB(0, 20, 0, 0),
+                      // alignment: Alignment(0.43, -0.56),
+                      alignment: Alignment.bottomRight,
+                      child: ListView.builder(
+                          shrinkWrap: true,
+                          clipBehavior: Clip.hardEdge,
+                          scrollDirection: Axis.horizontal,
+                          itemCount: widget.size!.length,
+                          itemBuilder: (context, index) {
+                            if (widget.size![index] == "null") {
+                              return Container(
+                                  width: 20, height: 20, child: Text(""));
+                            } else {
+                              return Padding(
+                                  padding: EdgeInsets.only(top: 100),
+                                  child: Sizes_show(widget.size!, index, () {
+                                    setState(() {
+                                      isSelectedList_size[index] =
+                                          !isSelectedList_size[index];
+                                    });
+                                    if (isSelectedList_size[index] == true) {
+                                      otherSizeString = widget.size![index];
+                                      isSelectedList_size = [
+                                        false,
+                                        false,
+                                        false,
+                                        false,
+                                        false
+                                      ];
+                                      isSelectedList_size[index] = true;
+                                    }
+                                  }));
+                            }
+                          }),
+                    ),
+
                     Align(
                       alignment: Alignment(-0.52, 0.01),
                       child: Padding(
@@ -218,58 +333,60 @@ class _DitalePageState extends State<DitalePage> {
                         width: 50,
                         height: 50,
                         decoration: BoxDecoration(
-                          color:isFavorite? Colors.white:Colors.red,
+                          color: favorite == true ? Colors.white : Colors.red,
                           shape: BoxShape.circle,
                         ),
                         child: IconButton(
                           onPressed: () {
-                          setState(() {
-                            isFavorite = !isFavorite;
-                          });
-                           
+                            setState(() {
+                              favorite = !favorite;
+                              addFavorite(favorite);
+                            });
                           },
-                         icon: Icon(
+                          icon: Icon(
                             Icons.favorite_sharp,
-                          color: isFavorite == false?Colors.white : Colors.red,
-                          size: 30,
+                            color:
+                                favorite == false ? Colors.white : Colors.red,
+                            size: 30,
                           ),
                         ),
                       ),
                     ),
+
                     Align(
-                        alignment: Alignment(-0.91, 0.8),
-                        child: SizedBox(
-                            width: 70,
-                            height: 60,
-                            child: OutlineButton(
-                              padding: EdgeInsets.zero,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(13)),
-                              onPressed: () async {
-                                print('clicked');
-                                await add_card().then((value) {
-                                  Navigator.pushNamed(context, '/orders');
-                                });
-                              },
-                              child: Icon(Icons.shopping_cart_outlined),
-                            ))),
-                    Align(
-                      alignment: Alignment(0.6, 0.8),
+                      alignment: Alignment(0, 0.8),
                       child: SizedBox(
                           width: 250,
                           height: 60,
-                          child: FlatButton(
-                            child: Text(
-                              'BUY NOW',
-                              style: TextStyle(
-                                fontFamily: 'Poppins',
-                                color: Color(0xFFF8F0F0),
-                              ),
+                          child: OutlineButton(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Text(
+                                  'BUY NOW',
+                                  style: TextStyle(
+                                    fontFamily: 'Poppins',
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                Icon(
+                                  Icons.shopping_cart_outlined,
+                                  color: Colors.black,
+                                ),
+                              ],
                             ),
-                            color: Colors.green,
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(15)),
-                            onPressed: () {/** */},
+                            onPressed: () async {
+                              print('clicked');
+                              if (widget.id == 1) {
+                                print('you admin here');
+                              } else {
+                                await add_card().then((value) {
+                                  Navigator.pushNamed(context, '/orders');
+                                });
+                              }
+                            },
                           )),
                     )
                   ],
@@ -344,9 +461,58 @@ class _DitalePageState extends State<DitalePage> {
                   borderRadius: BorderRadius.circular(60 / 2),
                 ),
               ),
-            )
+            ),
+            get_cart_items(),
           ],
         ),
+      ),
+    );
+  }
+
+  //  number of items in card in firebase firestore use stream builder
+  StreamBuilder<QuerySnapshot> get_cart_items() {
+    User? user = _auth.currentUser;
+    return StreamBuilder<QuerySnapshot>(
+      stream: firestore
+          .collection('users')
+          .doc(user!.uid)
+          .collection('card')
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+        number_of_item = snapshot.data!.docs.length;
+        return Container();
+      },
+    );
+  }
+
+  Padding Sizes_show(List size, int index, Function onTap) {
+    return Padding(
+      padding: const EdgeInsets.all(5.0),
+      child: InkWell(
+        onTap: () {
+          onTap();
+        },
+        child: Container(
+            height: 10,
+            padding: EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              color: isSelectedList_size[index] == true
+                  ? Color(0xFF445B81)
+                  : Colors.white,
+            ),
+            child: Text(
+              "${size[index]}",
+              style: TextStyle(
+                  color: isSelectedList_size[index] == true
+                      ? Colors.white
+                      : Colors.black),
+            )),
       ),
     );
   }
@@ -388,7 +554,7 @@ class _DitalePageState extends State<DitalePage> {
       String valueString =
           typeColors.split('(0x')[1].split(')')[0]; // kind of hacky..
       int value = int.parse(valueString, radix: 16);
-      Color Color_selct = new Color(value);
+      Color Color_selct = Color(value);
 
       if (listColor[i] != null) {
         // return Colors_show(Color_selct);
@@ -413,8 +579,7 @@ class _DitalePageState extends State<DitalePage> {
       quantity: amountState.number,
       category: widget.category,
       color: otherColorString == null ? 'black' : otherColorString,
-      size: 'M',
-    
+      size: otherSizeString == null ? 'S' : otherSizeString,
     );
     await firestore
         .collection('users')
@@ -424,6 +589,9 @@ class _DitalePageState extends State<DitalePage> {
         .set(cardModel.toMap());
     // .add(cardModel.toMap());
   }
+
+  // show number of items to buy
+
 }
 
 class Amount extends StatefulWidget {

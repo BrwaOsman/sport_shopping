@@ -53,6 +53,14 @@ final int? id;
                 Navigator.pushNamed(context, '/myAccount');
               },
             ),
+            ListTile(
+              title: Text('My Favorite'),
+              leading: Icon(Icons.favorite), // icon
+              onTap: () {
+                Navigator.pushNamed(context, '/favorite');
+              },
+            
+            ),
             Divider(),
             ListTile(
               title: Text('My Orders'),

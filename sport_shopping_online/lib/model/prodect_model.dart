@@ -9,20 +9,21 @@ class Product {
   int ? price;
   String ? description;
   String ? category;
-  String ? color;
   List? sizes;
   List ? colors;
   List<String> ? images_url;
+
+  
   Product(
       {this.name,
       this.image,
       this.price,
       this.description,
       this.category,
-      this.color,
       this.sizes,
       this.colors,
-      this.images_url});
+      this.images_url,
+ });
 
   factory Product.fromMap(map) {
     return Product(
@@ -31,10 +32,10 @@ class Product {
       price: map['price'],
       description: map['description'],
       category: map['category'],
-      color: map['color'],
       sizes: map['sizes'],
       colors: map['colors'],
       images_url: map['images_url'],
+
     );
   }
   Map<String, dynamic> toMap() {
@@ -44,10 +45,10 @@ class Product {
       'price' : price,
       'description' : description,
       'category' : category,
-      'color' : color,
       'sizes' : sizes,
       'colors' : colors,
       'images_url' : images_url,
+
     };
   }
 }

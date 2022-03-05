@@ -1,17 +1,17 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, prefer_final_fields
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, prefer_final_fields, unused_field, unnecessary_new, non_constant_identifier_names, avoid_print, deprecated_member_use
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:sport_shopping_online/Router/drawer.dart';
 import 'package:sport_shopping_online/model/prodect_model.dart';
 import 'package:sport_shopping_online/page/category.dart';
 import 'package:sport_shopping_online/server/firStorage.dart';
-import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'DitalePage.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+
+import 'Edit_product.dart';
 
 class Home extends StatefulWidget {
   final int? id;
@@ -27,29 +27,14 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
   TextEditingController _searchController = TextEditingController();
   bool _isSearch = false;
+  String? _getdataSesrch;
 
   TabController? _tabController;
-  String? TestA;
+  @override
   void initState() {
     super.initState();
     // 创建Controller
     _tabController = TabController(vsync: this, length: 5);
-    // var Test_user = _firestore
-    //     .collection('users')
-    //     .doc(_auth.currentUser!.uid)
-    //     .get()
-    //     .then((value) {
-    //   if (!value.exists) {
-
-    //     TestA = value.data().toString();
-    //      print(TestA);
-    //   } else {
-    //     TestA = value.data().toString();
-
-    //     print(TestA);
-
-    //   }
-    // });
   }
 
   FirebaseAuth _auth = FirebaseAuth.instance;
@@ -120,7 +105,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
               backgroundColor: Color(0xFF120B0B),
             )
           : null,
-                body: Padding(
+      body: Padding(
         padding: const EdgeInsets.only(top: 20.0),
         child: TabBarView(
           controller: _tabController,
@@ -144,7 +129,9 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           Padding(
             padding: const EdgeInsets.only(bottom: 15.0),
             child: TextField(
+              controller: _searchController,
               decoration: InputDecoration(
+                fillColor: Colors.white, filled: true ,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(20),
                   borderSide: BorderSide(
@@ -166,17 +153,26 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                 ),
               ),
               onChanged: (value) {
-                print(value);
+                if (value.length < 1) {
+                  setState(() {
+                    _getdataSesrch = null;
+                  });
+                } else {
+                  setState(() {
+                    _getdataSesrch = value;
+                    _getdataSesrch = _searchController.text;
+                  });
+                }
               },
             ),
           ),
 
         StreamBuilder<QuerySnapshot>(
-          stream: _firestore
-              .collection('products')
-              .where('category', isEqualTo: category_test)
-              .snapshots(),
-          //  stream: _fireStor.getDataUser(null),
+          // stream: _firestore
+          //     .collection('products')
+          //     .where('category', isEqualTo: category_test)
+          //     .snapshots(),
+          stream: _fireStor.getDataUser(_getdataSesrch, category_test),
           builder: (context, snapshot) {
             if (snapshot.data != null) {
               List<DocumentSnapshot> _docs = snapshot.data!.docs;
@@ -186,7 +182,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
               }
               List<Product> _product =
                   _docs.map((doc) => Product.fromMap(doc.data())).toList();
-              if (_product.length == 0) {
+              if (_product.isEmpty) {
                 return Center(
                     child: Lottie.asset("assets/Lottie/empty.json",
                         width: 600, height: 200));
@@ -203,7 +199,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                         scrollDirection: Axis.vertical,
                         itemCount: _product.length,
                         itemBuilder: (context, index) {
-                          return show_prodect(context, _product, index);
+                          return show_prodect(context, _product, index, _docs);
                         }));
               }
             }
@@ -216,27 +212,30 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     );
   }
 
-  InkWell show_prodect(
-      BuildContext context, List<Product> _product, int index) {
-    String typeColors = _product[index].color!;
-    String valueString =
-        typeColors.split('(0x')[1].split(')')[0]; // kind of hacky..
-    int value = int.parse(valueString, radix: 16);
-    Color otherColor = new Color(value);
+  InkWell show_prodect(BuildContext context, List<Product> _product, int index,
+      List<DocumentSnapshot> _docs) {
     return InkWell(
-      onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => DitalePage(
-                    image1: _product[index].image,
-                    title: _product[index].name,
-                    number: _product[index].price,
-                    primary: _product[index].color as String,
-                    color: _product[index].colors,
-                    size: _product[index].sizes,
-                    description: _product[index].description,
-                    category: _product[index].category,
-                  ))),
+      onTap: () {
+        print(_docs[index].id);
+        if (widget.id == 1) {
+          show_dialog_model(_product, index, _docs);
+        } else {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => DitalePage(
+                        id_product: _docs[index].id,
+                        id: widget.id,
+                        image1: _product[index].image,
+                        title: _product[index].name,
+                        number: _product[index].price,
+                        color: _product[index].colors,
+                        size: _product[index].sizes,
+                        description: _product[index].description,
+                        category: _product[index].category,
+                      )));
+        }
+      },
       child: Container(
         margin: EdgeInsets.all(5),
         alignment: Alignment.center,
@@ -318,7 +317,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           icon: SvgPicture.asset(
             "assets/icon/tshirt.svg",
             width: 30,
-
           ),
         ),
         Tab(
@@ -351,5 +349,120 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
         ),
       ],
     );
+  }
+
+  show_dialog_model(List<Product> _product, int index,
+      List<DocumentSnapshot> _docs) {
+    AlertDialog alertDialog = AlertDialog(
+        title: Text('About Model'),
+        content: Container(
+          // width: 300,
+          height: 200,
+
+          child: Column(
+            children: [
+              Text('Please Click on green button to Eidt your product.',
+                  style: TextStyle(
+                    fontFamily: 'Open Sans',
+                    color: Colors.green,
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    fontStyle: FontStyle.italic,
+                  )),
+              Text('Please Click on Red button to Delete your product.',
+                  style: TextStyle(
+                    fontFamily: 'Open Sans',
+                    color: Colors.red,
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    fontStyle: FontStyle.italic,
+                  )),
+                  SizedBox(height: 10,),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: RaisedButton(
+                      color: Colors.green,
+                      child: Row(
+                        children: [
+                          Text('Edit',style:TextStyle(color: Colors.white) ,),
+                          SizedBox(width: 10,),
+                          Icon(Icons.edit,color: Colors.white,)
+                        ],
+                      ),
+                      onPressed: () {
+                         Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => EditProduct(
+                        id_product: _docs[index].id,
+                        id: widget.id,
+                        image1: _product[index].image,
+                        title: _product[index].name,
+                        number: _product[index].price,
+                        color: _product[index].colors,
+                        size: _product[index].sizes,
+                        description: _product[index].description,
+                        category: _product[index].category,
+                      )));
+                      },
+                    ),
+                  ),
+                  
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: RaisedButton(
+                      color: Colors.red,
+                      child: Row(
+                        children: [
+                          Text('Delete',style:TextStyle(color: Colors.white) ,),
+                          SizedBox(width: 10,),
+                          Icon(Icons.delete,color: Colors.white,)
+                        ],
+                      ),
+                      onPressed: () {
+                        showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: Text('Are you sure to delete this product?',style: TextStyle(color: Colors.red,fontWeight: FontWeight.bold),),
+                                actions: [
+                                  FlatButton(
+                                    color: Colors.red,
+                                    child: Text('No',style: TextStyle(color: Colors.white),),
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                  FlatButton(
+                                    color: Colors.green,
+                                    child: Text('Yes',style: TextStyle(color: Colors.white),),
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                      // _product[index].reference.delete();
+                                    },
+                                  ),
+                                ],
+                              );
+                            });
+                      
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              RaisedButton(
+                color: Colors.black,
+                child: Text('cancel', style: TextStyle(color: Colors.white)),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        ));
+    return showDialog(context: context, builder: (_) => alertDialog);
   }
 }

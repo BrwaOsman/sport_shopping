@@ -1,23 +1,44 @@
-// ignore_for_file: prefer_const_constructors, non_constant_identifier_names, unused_field, override_on_non_overriding_member, prefer_const_literals_to_create_immutables, prefer_final_fields
+// ignore_for_file: prefer_const_constructors, non_constant_identifier_names, prefer_final_fields, override_on_non_overriding_member, avoid_print, prefer_const_literals_to_create_immutables
 
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:sport_shopping_online/model/prodect_model.dart';
-import 'package:sport_shopping_online/page/Home.dart';
-import 'package:sport_shopping_online/server/firStorage.dart';
-import 'package:flutter_material_color_picker/flutter_material_color_picker.dart';
 
-class AddProdect extends StatefulWidget {
-  final String? CategoryId;
-  const AddProdect({Key? key, this.CategoryId}) : super(key: key);
+import '../model/prodect_model.dart';
+import '../server/firStorage.dart';
+import 'Home.dart';
+
+class EditProduct extends StatefulWidget {
+   final String? image1;
+  final String? title;
+  final int? number;
+  final List? color;
+  final String? id_product;
+  final List? size;
+  final String? description;
+  final String? category;
+  final int? id;
+
+  const EditProduct({ Key? key ,
+    this.image1,
+    this.title,
+    this.number,
+    this.color,
+    this.id_product,
+    this.size,
+    this.description,
+    this.category,
+    this.id,
+
+  }) : super(key: key);
+
 
   @override
-  _AddProdectState createState() => _AddProdectState();
+  State<EditProduct> createState() => _EditProductState();
 }
 
-class _AddProdectState extends State<AddProdect> {
+class _EditProductState extends State<EditProduct> {
   @override
   bool Smole = false;
   bool Medium = false;
@@ -51,15 +72,50 @@ class _AddProdectState extends State<AddProdect> {
   File? imageFile;
   String? ImageUrl;
   bool img = false;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _nameController.text = widget.title!;
+    _priceController.text = widget.number.toString();
+    _descriptionController.text = widget.description!;
+    _smole = widget.size![0];
+    _smole == "null" ? Smole = false : Smole = true;
+    _medium = widget.size![1];
+    _medium != "null" ? Medium = true : Medium = false;
+       print(_medium);
+    _large = widget.size![2];
+    _large == "null" ? Large = false : Large = true;
+    _extraLarge = widget.size![3];
+    _extraLarge == "null" ? ExtraLarge = false : ExtraLarge = true;
+    _extraExtraLarge = widget.size![4];
+    _extraExtraLarge == "null" ? ExtraExtraLarge = false : ExtraExtraLarge = true;
+    _red = widget.color![0];
+   
+    _red =="null"? _redCheck = false: _redCheck = true;
+    _green = widget.color![1];
+    _green =="null"? _greenCheck = false: _greenCheck = true;
+    _blue = widget.color![2];
+    _blue =="null"? _blueCheck = false: _blueCheck = true;
+    _yellow = widget.color![3];
+    _yellow =="null"? _yellowCheck = false: _yellowCheck = true;
+    _orange = widget.color![4];
+    _orange =="null"? _orangeCheck = false: _orangeCheck = true;
+ 
+
+
+  }
  
 // form key
   final _formKey = GlobalKey<FormState>();
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[400] ,
+          backgroundColor: Colors.grey[400] ,
       appBar: AppBar(
         backgroundColor: Colors.grey[400] ,
-        title: Text('Add Product',style: TextStyle(color: Colors.black,fontSize: 20, fontFamily: 'Nisebuschgardens'),),
+        title: Text('Edit Product',style: TextStyle(color: Colors.black,fontSize: 20, fontFamily: 'Nisebuschgardens'),),
         centerTitle: true,
         actions: [
           IconButton(
@@ -75,7 +131,7 @@ class _AddProdectState extends State<AddProdect> {
      
         ],
       ),
-      body: Form(
+      body:Form(
           key: _formKey,
           child: ListView(
             children: [
@@ -91,14 +147,14 @@ class _AddProdectState extends State<AddProdect> {
                 height: 20,
               ),
               
-              if(widget.CategoryId == "dress" || widget.CategoryId == "bags" || widget.CategoryId == "shoes")
+              if(widget.category == "dress" || widget.category == "bags" || widget.category == "shoes")
               Center(
                 child: Text(
                   'Sizes',
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white , fontFamily: 'AquinoDemo'),
                 ),
               ),
-              if (widget.CategoryId == "dress" || widget.CategoryId == "bags") 
+              if (widget.category == "dress" || widget.category == "bags") 
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
@@ -135,7 +191,7 @@ class _AddProdectState extends State<AddProdect> {
                   }),
                 ],
               ),
-              if (widget.CategoryId == "shoes") 
+              if (widget.category == "shoes") 
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
@@ -249,9 +305,9 @@ class _AddProdectState extends State<AddProdect> {
                       borderRadius: BorderRadius.circular(15)),
                   child: Image.network(
                     img == false
-                        ? "https://images.unsplash.com/photo-1599420186946-7b6fb4e297f0?ixlib=rb-1.2.1&ixid=MnwxMjA3fDF8MHxlZGl0b3JpYWwtZmVlZHw2fHx8ZW58MHx8fHw%3D&auto=format&fit=crop&w=500&q=60"
+                        ? widget.image1!
                         : _stor.ImageUrl!,
-                    fit: BoxFit.cover,
+                    // fit: BoxFit.cover,
                   ),
                 ),
               ),
@@ -262,10 +318,10 @@ class _AddProdectState extends State<AddProdect> {
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-                onPressed: () async{
+                onPressed: () async {
                   if (_formKey.currentState!.validate()) {
                     _formKey.currentState!.save();
-                   if (_loading) return;
+                     if (_loading) return;
                     setState(() => _loading = true);
                     await Future.delayed(Duration(seconds: 5));
                     setState(() => _loading = false);
@@ -278,7 +334,7 @@ class _AddProdectState extends State<AddProdect> {
                         mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             CircularProgressIndicator(
-                              color: Colors.white,
+                              color: Colors.blue,
                             ),
                             SizedBox(
                               width: 24,
@@ -286,7 +342,7 @@ class _AddProdectState extends State<AddProdect> {
                             Text('Please waie ...')
                           ],
                         )
-                      : Text('Add Product',
+                      : Text('Update Product',
                     style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -297,7 +353,6 @@ class _AddProdectState extends State<AddProdect> {
           )),
     );
   }
-
   InkWell sizes(bool isChecked, String? size, String? value, String? show,
       Function onTap) {
     return InkWell(
@@ -322,7 +377,7 @@ class _AddProdectState extends State<AddProdect> {
     );
   }
 
- 
+
 
   Padding TextFormFiled(
       String labelText, TextEditingController controller, int x) {
@@ -391,12 +446,13 @@ class _AddProdectState extends State<AddProdect> {
       name: _nameController.text,
       price: int.parse(_priceController.text),
       description: _descriptionController.text,
-      category: widget.CategoryId,
+      category: widget.category,
       colors: colors,
       sizes: sizes,
       image: _stor.ImageUrl,
 
     );
-    await _firestore.collection('products').add(prodect_model.toMap());
+    await _firestore.collection('products').doc(widget.id_product).update(prodect_model.toMap());
   }
+
 }

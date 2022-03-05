@@ -1,23 +1,22 @@
-// ignore_for_file: avoid_unnecessary_containers, prefer_const_constructors, deprecated_member_use, prefer_final_fields, unused_field
+// ignore_for_file: prefer_const_constructors, prefer_final_fields
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:sport_shopping_online/Auth/Login.dart';
-import 'package:sport_shopping_online/model/user_model.dart';
 
-import '../page/Home.dart';
+import '../model/user_model.dart';
+import 'Home.dart';
 
-class Register extends StatefulWidget {
-  const Register({Key? key}) : super(key: key);
+class EditProfile extends StatefulWidget {
+  const EditProfile({ Key? key }) : super(key: key);
 
   @override
-  _RegisterState createState() => _RegisterState();
+  State<EditProfile> createState() => _EditProfileState();
 }
 
-class _RegisterState extends State<Register> {
-  TextEditingController _emailController = TextEditingController();
+class _EditProfileState extends State<EditProfile> {
+ TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   TextEditingController _confirmPasswordController = TextEditingController();
   TextEditingController _nameController = TextEditingController();
@@ -28,14 +27,36 @@ class _RegisterState extends State<Register> {
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
   FirebaseAuth _auth = FirebaseAuth.instance;
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+     var getdata =  _firestore.collection('users').doc(FirebaseAuth.instance.currentUser!.uid).get();
+    getdata.then((value) {
+     _emailController.text = value.data()!['user_email'];
+      _nameController.text = value.data()!['user_name'];
+      _phoneController.text = value.data()!['user_phone'];
+      _addressController.text = value.data()!['user_address'];
+      _cityController.text = value.data()!['user_city'];
+      _passwordController.text = value.data()!['user_password'];
+      _confirmPasswordController.text = value.data()!['user_password'];
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Colors.grey[400],
 
       appBar: AppBar(
         backgroundColor: Colors.grey[400],
-         automaticallyImplyLeading: false,
-        title: Text('Register', style: TextStyle(color: Colors.black, fontSize: 20,fontFamily: 'Nisebuschgardens'),),
+        //  automaticallyImplyLeading: false,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios, color: Colors.black,),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        title: Text('Update Profile', style: TextStyle(color: Colors.black, fontSize: 20,fontFamily: 'Nisebuschgardens'),),
         centerTitle: true,
       ),
       body: Container(
@@ -57,16 +78,14 @@ class _RegisterState extends State<Register> {
                   borderRadius: BorderRadius.circular(20),
                 ),
               ),
-                child: Text('Register', style: TextStyle(color: Colors.black, fontSize: 20,fontFamily: 'Nisebuschgardens'),),
+                child: Text('Update Profile', style: TextStyle(color: Colors.black, fontSize: 20,fontFamily: 'Nisebuschgardens'),),
                 onPressed: () {
-                 register_sytelm();
+                 Update_profile();
                   print('Register');
                 },
               ),
             ),
-            TextButton(onPressed: (){
-              Navigator.push(context, MaterialPageRoute(builder: (context)=>Login_system()));
-            }, child: Text('I have acount !', style: TextStyle(color: Colors.black, fontSize: 20,fontFamily: 'Nisebuschgardens'),)),
+
           
           ],
         ),
@@ -91,7 +110,7 @@ class _RegisterState extends State<Register> {
     );
   }
 
-  Future<UserCredential> register_sytelm() async {
+  Future<UserCredential> Update_profile() async {
     UserCredential register = await _auth.createUserWithEmailAndPassword(
         email:_emailController.text , password: _passwordController.text);
     final User? user = register.user;

@@ -1,7 +1,9 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_shopping_online/Auth/Login.dart';
 import 'package:sport_shopping_online/page/AddProdect.dart';
 import 'package:sport_shopping_online/page/Home.dart';
 
@@ -13,12 +15,26 @@ class Category_show extends StatefulWidget {
 }
 
 class _CategoryState extends State<Category_show> {
+  FirebaseAuth _auth = FirebaseAuth.instance;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor:Colors.grey[400] ,
       appBar: AppBar(
-        title: Text('Category'),
+        title: Text('Category',style: TextStyle(color: Colors.black,
+        fontFamily:'Nisebuschgardens' ),),
         centerTitle: true,
+        leading: IconButton(
+          icon: Icon(Icons.logout),
+          onPressed: () {
+         _auth.signOut();
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => Login_system()),
+            );
+          },
+        ),
+        backgroundColor: Colors.grey[400],
           actions: [
           IconButton(
             icon: Icon(Icons.shop),
@@ -63,15 +79,15 @@ class _CategoryState extends State<Category_show> {
               child: Container(
                 height: 50,
                 decoration: BoxDecoration(
-                  color: Colors.blue,
+                  color: Colors.white,
                   borderRadius:  BorderRadius.circular(20),
                   
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    Text('$name',style: TextStyle(color: Colors.white,fontSize: 20),),
-                    Icon(Icons.arrow_forward_ios,color: Colors.white,size: 20,)
+                    Text('$name',style: TextStyle(color: Colors.black,fontSize: 20,fontFamily: 'AquinoDemo'),),
+                    Icon(Icons.arrow_forward_ios,color: Colors.black,size: 20,)
                   ],
                 ),
               ),
